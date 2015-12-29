@@ -7,6 +7,8 @@ from zipfile import ZipFile
 
 from BeautifulSoup import BeautifulSoup
 
+import creds
+
 
 session = requests.Session()
 
@@ -107,7 +109,7 @@ class Prog1(object):
 
 if __name__ == '__main__':
     logging.basicConfig(level=20)
-    login('username', 'password')
+    login(creds.username, creds.password)
 
     p1 = Prog1()
     p1.start()
