@@ -223,9 +223,7 @@ if __name__ == '__main__':
     login(creds.username, creds.password)
 
     p1 = Prog1()
-    final = p1.start()
-    with open('done.html', 'w') as z:
-        z.write(final.content)
+    p1.start()
 
     p2 = Prog2()
     p2.start()
