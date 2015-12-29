@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import re
 from functools import wraps
@@ -9,6 +10,7 @@ from zipfile import ZipFile
 
 from BeautifulSoup import BeautifulSoup
 from PIL import Image
+from collections import Counter
 
 import creds
 
@@ -218,12 +220,59 @@ class Prog2(Prog):
         return r
 
 
+class Prog3(Prog):
+
+    def eval_cross_total(self, strmd5):
+        int_total = 0
+        # this line is unnecessary since python strings are already iterable
+        # but this is just to show what it does
+        arr_md5_chars = list(strmd5)
+        for value in arr_md5_chars:
+            int_total += int('0x0' + value, 0)
+        return int_total
+
+    def encrypt_string(self, strst, strpw):
+        # strst is the content of the entire file with serials
+        str_password_md5 = hashlib.md5(strpw).hexdigest()
+        int_md5_total = self.eval_cross_total(str_password_md5)
+        arr_encrypted_values = []
+        int_str_len = len(strst)
+        for i in range(int_str_len):
+            ordinal = ord(strst[i:i+1])
+            pw = '0x0' + str_password_md5[i % 32:i % 32+1]
+            arr_encrypted_values.append(ordinal + int(pw, 0) - int_md5_total)
+            int_md5_total = self.eval_cross_total(hashlib.md5(strst[0:i+1]).hexdigest()[0:16] + hashlib.md5(str(int_md5_total)).hexdigest()[0:16])
+        print arr_encrypted_values
+        return ' '.join([str(x) for x in arr_encrypted_values])
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=20)
-    login(creds.username, creds.password)
+    # login(creds.username, creds.password)
+    #
+    # p1 = Prog1()
+    # p1.start()
+    #
+    # p2 = Prog2()
+    # p2.start()
 
-    p1 = Prog1()
-    p1.start()
-
-    p2 = Prog2()
-    p2.start()
+    p3 = Prog3()
+    print hashlib.md5('ayylmao').hexdigest()
+    data = p3.encrypt_string("""99Z-KH5-OEM-240-1.1
+QGG-V33-OEM-0B1-1.1
+Z93-Z29-OEM-BNX-1.1
+IQ0-PZI-OEM-PK0-1.1
+UM4-VDL-OEM-B9O-1.1
+L0S-4R2-OEM-UQL-1.1
+JBL-EYQ-OEM-ABB-1.1
+NL1-3V3-OEM-L4C-1.1
+7CQ-1ZR-OEM-U3I-1.1
+XX0-IHL-OEM-5XK-1.1
+KJQ-RXG-OEM-TW8-1.1
+OZR-LW1-OEM-5EM-1.1
+0B8-6K5-OEM-EFN-1.1
+OE2-20L-OEM-SSI-1.1
+0ME-HAE-OEM-9XB-1.1
+""", 'ayylmao')
+    ctr = Counter(data.split())
+    print ctr
